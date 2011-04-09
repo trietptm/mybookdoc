@@ -1,0 +1,12 @@
+经典的动网上传漏洞的原理是：
+在上传的时候 默认的存放路径是 filepath 这是是在表单中的一个隐藏属性 
+<form name="form" method="post" action="UpFile.asp" ...>
+<input type="hidden" name="filepath" value="uploadFace">
+<input type="hidden" name="act" value="upload">
+<input type="file" name="file1">
+<input type="hidden" name="fname">
+<input type="submit" name="Submit" value="上传" ...></form>
+
+当我们把uploadFace的后面添加上\x00的时候会倒是服务器在检测的时候，把路径当成 ....../uploadFace\x00aa.jpg
+然后程序会对这个路径进行相关的操作而一般一些函数都是遇到0截止的 也就是说 程序会把路径当成 ...../uploadFace 不要后面的aa.jpg了 
+我们把uploadFace改成kk.asp 那么程序会把文件存成kk.asp 这样漏洞就产生了。
