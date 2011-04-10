@@ -1,0 +1,2 @@
+sudo pppoeconf
+sudo /etc/init.d/networking restart
