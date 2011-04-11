@@ -1,0 +1,10 @@
+在类的前面调用
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+然后使用函数
+_CrtDumpMemoryLeaks();可以打印出所有的内存释放。
+原理好像是把相应的申请内存的函数都hook了都记录下来 然后打印出来
+
+malloc 申请的内存用free释放后并没有立即还给系统 而是在自己手里先拿着，这样系统就显示程序使用的内存并没有减少。
+而实际上已经减少了
