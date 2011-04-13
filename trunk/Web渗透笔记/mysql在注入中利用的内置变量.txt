@@ -1,0 +1,36 @@
+MySQL注入数据库时，我们可以利用内置的变量来得到更多的mysql信息，下面就让我们一起来了解MySQL注入利用的变量。
+当我们注射mysql库的输入点的时候,可以通过version()/user()/database()/password()等内置函数来得到mysql的相关信息,其实我们在注射的时候可以利用mysql内置的变量来得到更多的mysql信息
+其中version()可以写成@@version来把version当做变量来读取,这样一样可以得到,其他的内置是不可以写成变量的形式.
+大家都应该用过利用pangolin来注入mysql库的注射点,认真的朋友都应该知道可以的得到basedir和datadir这两个变量的信息,其实还有更多的变量在注射的时候可以利用
+我整理了几个在注射的时候可以利用到,收集更多关于mysql的配置信息
+@@have_openssl 如果mysqld支持客户端/服务器协议的SSL(加密)则为YES
+@@version_compile_os 判断系统类型
+@@max_allowed_packet 包或任何生成的/中间字符串的最大大小
+@@max_user_connections MySQL账户允许的最大同时连接数,0表示没限制
+@@skip_networking 如果服务器只允许本地(非TCP/IP)连接，该值为ON
+@@table_type 默认表类型(存储引擎)
+@@basedir MySQL安装基准目录
+@@character_set_database 默认数据库使用的字符集
+@@datadir 数据库存储的地方
+@@expire_logs_days 二进制日志自动删除的天数,默认是0,表示"没有自动删除"
+@@group_concat_max_len 允许group_concat()函数结果的最大长度
+@@log_error 错误日志的位置
+@@lower_case_file_system 该变量说明是否数据目录所在的文件系统对文件名的大小写敏感.
+ON说明对文件名的大小写不敏感，OFF表示敏感
+@@lower_case_table_names 如果设置为1,表名用小写保存到硬盘上，并且表名比较时不对大小写敏感.
+如果设置为2，按照指定的保存表名，但按照小写来比较
+@@plugin_dir 插件目录的路径
+@@tmpdir 保存临时文件和临时表的目录
+@@tmp_table_size 如果内存内的临时表超过该值，MySQL自动将它转换为硬盘上的MyISAM表
+@@sql_mode 当前服务器的sql模式
+@@tx_isolation 默认事务隔离级别。默认值为REPEATABLE-READ
+@@Connections 连接mysql数据库服务器的次数(不管成功还是失败)
+@@max_write_lock_count 最大写锁数量
+@@old_passwords 是否启用mysql323加密方式(就是mysql用户密码的hash是16位的)
+@@Uptime 服务器已经运行的时间
+其中我感觉basedir/version_compile_os/log_error/group_concat_max_len这四个变量的作用很大,大家看上面的注视
+group_concat_max_len这个变量涉及到group_concat()的返回字符长度,所以在使用group_concat()来注射时候要注意长度的限制.
+tips:group_concat()函数的利用如下
+url and 1=2 union select 1,group_concat(schema_name),3,4 from information_schema.schemata
+这样的话,就可以把当前用户中建立数据库名全部显示出来,在注射表名、字段名、字段属性都可以使用,这样的话又省了不少体力活
+同时group_concat()还可以绕过不能使用limit的现实,当然不嫌累的话,可以使用"!="的形式来绕过limit的限制。

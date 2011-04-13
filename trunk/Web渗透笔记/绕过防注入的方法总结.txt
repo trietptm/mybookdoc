@@ -1,0 +1,11 @@
+如下示例：
+<%
+	id=request("id")
+	id=replace(id,"and","")
+	id=replace(id," ","")
+	id=replace(id,",","")
+	response.write(id)
+%>
+绕过的方法是利用request("id")会把 &id=1&id=2这样的提交解释成
+&id=12所以可以提交以下语句 
+&id=1an&id=d+1=1 中间的&id=就别过滤掉了 
