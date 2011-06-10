@@ -1,0 +1,4 @@
+root@bt:/pentest/exploits/framework3/tools# ./pattern_create.rb 5000
+把生成的字符串放到会导致崩溃的缓冲区里面 崩溃以后
+root@bt:/pentest/exploits/framework3/tools# ./pattern_offset.rb 0x356b4234 5000
+程序的返回就是字符串的长度 这个长度后面就是eip的值

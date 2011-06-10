@@ -1,0 +1,64 @@
+<html>
+	<head>
+	</head>
+	<body onload="">
+
+		<div id='axcontainer' name='kkmylove'>
+		</div>
+	</body>
+	<script language="javascript">
+		var clsid = "{3EA80FAB-1183-4935-9967-5BB11FC52A74}";
+		function createObject() {
+			var cls = clsid.substring(1, clsid.length - 1);
+			document.getElementById('axcontainer').innerHTML =
+			"<" + "object id='target' classid=\"CLSID:" + cls + "\" ><" + "/object>";
+		}
+
+		function afterLoadActiveX() {
+			var activeXObject = document.createElement('object');
+			activeXObject.setAttribute('id','webagent');
+			activeXObject.setAttribute('classid','CLSID:3EA80FAB-1183-4935-9967-5BB11FC52A74');
+			activeXObject.setAttribute('height','1');
+			activeXObject.setAttribute('width','1');
+			activeXObject.setAttribute('align','baseline');
+			document.body.appendChild(activeXObject);
+		}
+
+		function ActiveXKiller(AcitveXObjectID,ContianerID) {
+			var   ce=document.getElementById(ContianerID);
+			if (ce) {
+				var   cce=ce.children;
+				for(var   i=0;i<cce.length;i=i+1) {
+					if(cce[i].id==AcitveXObjectID) {
+						ce.removeChild(cce[i]);
+						alert('111');
+					}
+				}
+			}
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*var activeXObject = document.createElement('object');
+		 activeXObject.setAttribute('id','webagent');
+		 activeXObject.setAttribute('classid','CLSID:3EA80FAB-1183-4935-9967-5BB11FC52A74');
+		 activeXObject.setAttribute('height','1');
+		 activeXObject.setAttribute('width','1');
+		 activeXObject.setAttribute('align','baseline');
+		 document.body.appendChild(activeXObject);
+		 webagent.getlong(1);
+		 document.body.removeChild(activeXObject);
+		 activeXObject = [];
+		 CollectGarbage();*/
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		/*createObject();
+		document.getElementById('axcontainer').innerHTML = "";
+		CollectGarbage();*/
+		createObject();
+		//target.GetNum(target);
+		eval("target.GetDis(target)");
+		//document.getElementById('axcontainer').innerHTML = "";
+		//CollectGarbage();
+	    
+	</script>
+</html>
