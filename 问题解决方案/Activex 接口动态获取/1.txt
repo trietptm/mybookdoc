@@ -1,0 +1,156 @@
+控件的属性列表则通过控件的typeinfo接口可以得到，得到dispatch接口指针后，调用  
+  gettypeinfocount，往往返回1，或2，第一个接口就是属性和方法的描述，第2个itypeinfo  
+  接口可能是事件描述的接口，然后调用gettypeinfo?(可能是吧)得到itypeinfo接口，  
+  调用itypeinfo的函数，然后获得函数的数量，根据每一个函数的描述来判断是属性(还分get和put)  
+  还是方法，然后取得该属性的名称，dispid(dispatch   id,或称memberid)  
+   
+  bool   cpropertywnd::adddispatch(iunknown*   piunknown)  
+  {  
+    idispatch   *pdispatch;  
+    piunknown->queryinterface(iid_idispatch,   (void   **)&pdispatch);  
+    itypeinfo   *ptypeinfo;  
+     
+    if   (pdispatch   ==   null)  
+        return   false;  
+   
+    pdispatch->gettypeinfo(0,   locale_system_default,   &ptypeinfo);  
+   
+    if   (ptypeinfo   ==   null)  
+        return   false;  
+     
+    typeattr*   pta;  
+    ptypeinfo->gettypeattr(&pta);  
+   
+    if   (pta->typekind   ==   tkind_interface)  
+    {  
+        //   取得第二个接口  
+        itypeinfo   *pinfotemp;  
+        hreftype   href;  
+        hresult   hr   =   ptypeinfo->getreftypeofimpltype(-1,   &href);  
+        if   (failed(hr))  
+            return   false;  
+   
+        hr   =   ptypeinfo->getreftypeinfo(href,   &pinfotemp);  
+        if   (failed(hr))  
+            return   false;  
+   
+        ptypeinfo->releasetypeattr(pta);  
+        ptypeinfo   =   pinfotemp;  
+        ptypeinfo->gettypeattr(&pta);  
+    }  
+   
+    int   nitem   =   m_listctrl.getitemcount();  
+     
+    for   (int   i   =   0;   i   <   pta->cfuncs;   i++)  
+    {  
+        funcdesc*   pfd;  
+        ptypeinfo->getfuncdesc(i,   &pfd);  
+        if   (pfd->invkind   &   dispatch_propertyget  
+            &&   (pfd->wfuncflags   &   (funcflag_frestricted   |   funcflag_fhidden))   ==   0)  
+        {  
+            switch   (pfd->elemdescfunc.tdesc.vt)  
+            {  
+            case   vt_userdefined:  
+            case   vt_empty:  
+            case   vt_null:  
+            case   vt_i2:  
+            case   vt_i4:  
+            case   vt_r4:  
+            case   vt_r8:  
+            case   vt_cy:  
+            case   vt_date:  
+            case   vt_bstr:  
+            case   vt_error:  
+            case   vt_bool:  
+            case   vt_variant:  
+            case   vt_decimal:  
+            case   vt_i1:  
+            case   vt_ui1:  
+            case   vt_ui2:  
+            case   vt_ui4:  
+            case   vt_int:  
+            case   vt_uint:  
+            case   vt_ptr:  
+                {  
+                    itypeinfo*   pusertypeinfo   =   null;  
+                    vartype   vt;  
+                    vt   =   pfd->elemdescfunc.tdesc.vt;  
+                     
+                    if   (pfd->elemdescfunc.tdesc.vt   ==   vt_userdefined)  
+                    {  
+                        hreftype   hrt   =   pfd->elemdescfunc.tdesc.hreftype;  
+                        vt   =   vt_userdefined;  
+                        hresult   hr   =   e_fail;  
+                        hr   =   getenumtypeinfo(ptypeinfo,   hrt,   &pusertypeinfo);  
+                        if(failed(hr))  
+                            vt   =   getuserdefinedtype(ptypeinfo,   hrt);  
+                    }  
+   
+  /*                     if   (pfd->elemdescfunc.tdesc.vt   ==   vt_ptr)  
+                    {  
+                        hreftype   hrt   =   pfd->elemdescfunc.tdesc.lptdesc->hreftype;  
+                        vartype   vt   =   pfd->elemdescfunc.tdesc.lptdesc->vt;  
+   
+                        if   (succeeded(ptypeinfo->getreftypeinfo(hrt,   &pusertypeinfo)))  
+                        {  
+                            itypelib   *pitypelib;  
+                            uint   nindex   =   null;  
+                            if   (succeeded(pusertypeinfo.p->getcontainingtypelib(&pitypelib,   &nindex)))  
+                            {  
+                                ccombstr   bstr   =   null;  
+                                pitypelib.p->getdocumentation(nindex,   &bstr,   null,   null,   null);  
+   
+                                if   (bstr   ==   "ifontdisp")  
+                                    bstr   =   "font";  
+                                else   if   (bstr   ==   "ipicturedisp")  
+                                    bstr   =   "picture";  
+                                else  
+                                    continue;  
+   
+                                ccomvariant   varval;  
+                                ccombstr   bstrval;  
+                                ccombstr   bstrdocstring;  
+                                 
+                                ccomdispatchdriver   dd(pdisp);  
+                                dd.getproperty(pfd->memid,   &varval);  
+                                cproperty*   pprop   =   new   cproperty(pdisp,   pfd->memid,   varval,   vt,   bstrdocstring,   spusertypeinfo);  
+                                pprop->getstringvalue(&bstrval);  
+                                 
+                                m_list.additem(nitem,   0,   ole2t(bstr));  
+                                m_list.additem(nitem,   1,   ole2t(bstrval));  
+                                m_list.setitemdata(nitem,   reinterpret_cast<dword>(pprop));  
+                                nitem++;  
+                            }  
+                        }  
+                        continue;  
+                    }  
+  */  
+                    colevariant   varval;  
+                    bstr   bstrval;  
+                    bstr   bstrname;  
+                    bstr   bstrdocstring;  
+   
+                    ptypeinfo->getdocumentation(pfd->memid,   &bstrname,   &bstrdocstring,   null,   null);  
+   
+                    dispparams   dispparamsnoargs   =   {null,   null,   0,   0};  
+                    pdispatch->invoke(pfd->memid,   iid_null,     locale_user_default,   dispatch_propertyget,  
+                            &dispparamsnoargs,   &varval,   null,   null);  
+   
+                    cproperty*   pprop   =   new   cproperty(pdispatch,   pfd->memid,   varval,   bstrdocstring,   pusertypeinfo);  
+                    pprop->getstringvalue((bstr*)&bstrval);  
+                     
+                    cstring   strname   =   bstrname;  
+                    cstring   strval   =   bstrval;  
+   
+                    additem(nitem,   0,   strname);  
+                    additem(nitem,   1,   strval);  
+   
+                    m_listctrl.setitemdata(nitem,   reinterpret_cast<dword>(pprop));  
+                    nitem++;  
+                }  
+            }  
+        }  
+        ptypeinfo->releasefuncdesc(pfd);  
+    }  
+    ptypeinfo->releasetypeattr(pta);  
+    return   s_ok;   
