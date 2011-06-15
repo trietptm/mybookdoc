@@ -7,7 +7,7 @@
 		</div>
 	</body>
 	<script language="javascript">
-		var clsid = "{3EA80FAB-1183-4935-9967-5BB11FC52A74}";
+		var clsid = "{8A151752-825A-4836-B12F-5A4C0379F0F1}";
 		function createObject() {
 			var cls = clsid.substring(1, clsid.length - 1);
 			document.getElementById('axcontainer').innerHTML =
@@ -56,7 +56,8 @@
 		CollectGarbage();*/
 		createObject();
 		//target.GetNum(target);
-		eval("target.GetDis(target)");
+		//eval("target.Test(target)");
+		target.GetIDispatch(True);
 		//document.getElementById('axcontainer').innerHTML = "";
 		//CollectGarbage();
 	    
